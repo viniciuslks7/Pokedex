@@ -12,7 +12,7 @@ O projeto é construído com as seguintes tecnologias:
 
 ## Como Usar
 
-Para executar o código deste projeto de forma local, recomendamos o uso da extensão "Live Server" no Visual Studio Code para obter uma visualização em tempo real. Simplesmente clique com o botão direito no arquivo HTML principal e selecione "Open with Live Server" para iniciar a aplicação.
+Para executar o código deste projeto de forma local, recomendo o uso da extensão "Live Server" no Visual Studio Code para obter uma visualização em tempo real. Simplesmente clique com o botão direito no arquivo HTML principal e selecione "Open with Live Server" para iniciar a aplicação.
 
 ### Imagens Animadas (GIF)
 
