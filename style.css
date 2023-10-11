@@ -1,0 +1,101 @@
+/* Definições gerais de estilo */
+* {
+    margin: 0; /* Define margem zero para todos os elementos */
+    padding: 0; /* Define preenchimento zero para todos os elementos */
+    box-sizing: border-box; /* Garante que a caixa do modelo de caixa não seja afetada pelo preenchimento e pela borda */
+    font-family: 'Oxanium', cursive; /* Define a fonte padrão para a página */
+}
+
+/* Estilo do corpo da página */
+body {
+    text-align: center; /* Alinha o texto ao centro */
+    background: linear-gradient(to bottom, #6ab7f5, #fff); /* Define um plano de fundo de gradiente linear */
+    min-height: 100vh; /* Define a altura mínima da página para ocupar a tela inteira verticalmente */
+}
+
+/* Estilos para o conteúdo principal */
+main {
+    display: inline-block; /* Define o elemento principal como um bloco inline */
+    margin-top: 2%;  /* Define uma margem superior de 2% */
+    padding: 15px; /* Adiciona preenchimento de 15px */
+    position: relative; /* Define a posição relativa para posicionamento dos elementos filhos */
+}
+
+/* Estilo da imagem da Pokédex */
+.pokedex {
+    width: 100%; /* Define a largura da imagem como 100% */
+    max-width: 425px; /* Define a largura máxima da imagem como 425px */
+}
+
+/* Estilo da imagem do Pokémon */
+.pokemon_image {
+    position: absolute; /* Define a posição absoluta para o posicionamento da imagem */
+    bottom: 55%; /* Define a distância do fundo em 55% */
+    left: 50%; /* Define a distância da esquerda em 50% */
+    transform: translate(-63%, 20%); /* Aplica uma transformação para posicionar a imagem */
+    height: 18%; /* Define a altura da imagem como 18% */
+}
+
+/* Estilo dos dados do Pokémon */
+.pokemon_data {
+    position: absolute; /* Define a posição absoluta para o posicionamento dos dados */
+    font-weight: 600; /* Define a espessura da fonte como 600 (negrito) */
+    color: #aaa; /* Define a cor do texto como cinza */
+    top: 54.5%; /* Define a distância do topo em 54.5% */
+    right: 27%; /* Define a distância da direita em 27% */
+    font-size: clamp(8px, 5vw, 25px); /* Define o tamanho da fonte com base na largura da viewport */
+}
+
+/* Estilo do nome do Pokémon */
+.pokemon_name {
+    color: #3a444d; /* Define a cor do nome do Pokémon como azul escuro */
+    text-transform: capitalize; /* Transforma o texto em maiúscula inicial */
+}
+
+/* Estilo do formulário de pesquisa */
+.form {
+    position: absolute; /* Define a posição absoluta para o formulário de pesquisa */
+    width: 65%; /* Define a largura do formulário como 65% */
+    top: 65%; /* Define a distância do topo em 65% */
+    left: 13.5%; /* Define a distância da esquerda em 13.5% */
+}
+
+.input_search {
+    width: 100%; /* Define a largura da caixa de pesquisa como 100% */
+    padding: 4%; /* Adiciona preenchimento de 4% */
+    outline: none; /* Remove a borda ao focar na caixa de pesquisa */
+    border: 2px solid #333; /* Define uma borda de 2px sólida com a cor cinza */
+    border-radius: 5px; /* Define um raio de borda de 5px para arredondamento */
+    font-weight: 600; /* Define a espessura da fonte como 600 (negrito) */
+    color: #3a444d; /* Define a cor do texto como azul escuro */
+    font-size: clamp(8px, 5vw, 1rem); /* Define o tamanho da fonte com base na largura da viewport */
+    box-shadow: -3px 4px 0 #888, -5px 7px 0 #333; /* Adiciona uma sombra à caixa de pesquisa */
+}
+
+/* Estilo dos botões de navegação */
+.buttons {
+    position: absolute; /* Define a posição absoluta para os botões de navegação */
+    bottom: 10%; /* Define a distância do fundo em 10% */
+    left: 50%; /* Define a distância da esquerda em 50% */
+    width: 65%; /* Define a largura dos botões de navegação como 65% */
+    transform: translate(-57%, 0); /* Aplica uma transformação para posicionar os botões */
+    display: flex; /* Define a exibição como flexível para alinhar os botões horizontalmente */
+    gap: 20px; /* Define o espaço entre os botões como 20px */
+}
+
+.button {
+    width: 50%; /* Define a largura dos botões como 50% */
+    padding: 4%; /* Adiciona preenchimento de 4% */
+    border: 2px solid #000; /* Define uma borda de 2px sólida com a cor preta */
+    border-radius: 5px; /* Define um raio de borda de 5px para arredondamento */
+    font-size: clamp(8px, 8vw, 1rem); /* Define o tamanho da fonte com base na largura da viewport */
+    font-weight: 600; /* Define a espessura da fonte como 600 (negrito) */
+    color: white; /* Define a cor do texto como branca */
+    background-color: #444; /* Define a cor de fundo como cinza escuro */
+    box-shadow: -2px 3px 0 #222, -4px 6px 0 #000; /* Adiciona uma sombra aos botões */
+}
+
+.button:active{
+    box-shadow: inset -4px 4px 0 #222; /* Adiciona uma sombra interna quando o botão é pressionado */
+    font-size: 0.9rem; /* Reduz o tamanho da fonte quando o botão é pressionado */
+}

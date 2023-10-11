@@ -1,0 +1,33 @@
+<!DOCTYPE html> <!-- Define o tipo de documento como HTML5 -->
+<html lang="en"> <!-- Define o idioma da página como inglês -->
+<head>
+    <meta charset="UTF-8"> <!-- Configura a codificação de caracteres -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Configura a viewport para dispositivos móveis -->
+    <title>Pokedex</title> <!-- Define o título da página -->
+
+    <link rel="icon" href="/favicons/favicon-16x16.png"> <!-- Configura o ícone da página -->
+    <link rel="stylesheet" href="style.css"> <!-- Importa o arquivo CSS -->
+    <script defer src="js/script.js"></script> <!-- Importa o arquivo JavaScript com defer para carregamento assíncrono -->
+</head>
+<body>
+    <main> <!-- Define a seção principal da página -->
+        <img src="#" alt="pokemon" class="pokemon_image"> <!-- Imagem do Pokémon -->
+
+        <h1 class="pokemon_data"> <!-- Dados do Pokémon -->
+            <span class="pokemon_number"></span> - <!-- Número do Pokémon -->
+            <span class="pokemon_name"></span> <!-- Nome do Pokémon -->
+        </h1>
+
+        <form class="form"> <!-- Formulário de pesquisa -->
+            <input type="search" class="input_search" placeholder="Name or Number" required> <!-- Caixa de pesquisa -->
+        </form>
+
+        <div class="buttons"> <!-- Botões de navegação -->
+            <button class="button btn-prev">Prev &lt;</button> <!-- Botão de página anterior -->
+            <button class="button btn-next">Next &gt;</button> <!-- Botão de próxima página -->
+        </div>
+        
+        <img src="/images/pokedex.png" alt="pokedex" class="pokedex"> <!-- Imagem da Pokédex -->
+    </main>
+</body>
+</html>
