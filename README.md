@@ -14,7 +14,7 @@ Abra a página servida na porta 8000 no seu navegador. Também é possível usar
 
 ## Publicar o site
 
-O fluxo `.github/workflows/pages.yml` valida as regras e prepara o site em cada alteração enviada para `main`. Em pull requests, executa a validação sem publicar. Para habilitar a publicação, abra **Settings → Pages** no repositório e escolha **GitHub Actions** em **Source**. Depois envie as alterações para `main` ou execute **Actions → Publish Pokédex → Run workflow**. A publicação usa as permissões temporárias do próprio GitHub, sem chaves adicionais.
+O fluxo `.github/workflows/pages.yml` usa Node.js 24 na validação e nas ações de publicação, valida as regras e prepara o site em cada alteração enviada para `main`. Em pull requests, executa a validação sem publicar. Para habilitar a publicação, abra **Settings → Pages** no repositório e escolha **GitHub Actions** em **Source**. Depois envie as alterações para `main` ou execute **Actions → Publish Pokédex → Run workflow**. A publicação usa as permissões temporárias do próprio GitHub, sem chaves adicionais.
 
 O endereço padrão deste repositório é `https://viniciuslks7.github.io/Pokedex/`, disponível depois que o trabalho de publicação terminar com sucesso. A interface usa caminhos relativos, incluindo o manifesto e o service worker. Ao atualizar, quem já usa o aplicativo pode receber a opção “Atualizar aplicativo”.
 
