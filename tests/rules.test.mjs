@@ -408,12 +408,25 @@ test("Suggestions handle empty teams and missing type data without inventing neu
     ),
   );
 });
-test("Bundled suggestion types match official preview data", async () => {
-  const { readFile } = await import("node:fs/promises");
-  const snapshot = JSON.parse(
-    await readFile(new URL("../.preview-data.json", import.meta.url), "utf8"),
-  );
+test("Bundled suggestions have valid unique species/types and match official preview data when available", async () => {
+  const { readFileSync, existsSync } = await import("node:fs");
   assert.equal(teamCandidates.length, 43);
+  assert.equal(new Set(teamCandidates.map(({ id }) => id)).size, 43);
+  assert.equal(new Set(teamCandidates.map(({ name }) => name)).size, 43);
+  for (const candidate of teamCandidates) {
+    assert.ok(
+      Number.isSafeInteger(candidate.id) && candidate.id > 0 && candidate.id < 10000,
+    );
+    assert.match(candidate.name, /^[a-z0-9-]+$/);
+    assert.ok(candidate.types.length >= 1 && candidate.types.length <= 2);
+    assert.equal(new Set(candidate.types).size, candidate.types.length);
+    assert.ok(candidate.types.every((name) => Object.hasOwn(chart, name)));
+  }
+  // A clean checkout has no downloaded preview; keep the data checks independent
+  // of that cache, and compare against the official snapshot whenever available.
+  const file = new URL("../.preview-data.json", import.meta.url);
+  if (!existsSync(file)) return;
+  const snapshot = JSON.parse(readFileSync(file, "utf8"));
   for (const candidate of teamCandidates) {
     const pokemon = snapshot.pokemon[candidate.id];
     assert.equal(candidate.name, pokemon.name);
