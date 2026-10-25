@@ -1,33 +1,1672 @@
-<!DOCTYPE html> <!-- Define o tipo de documento como HTML5 -->
-<html lang="en"> <!-- Define o idioma da página como inglês -->
-<head>
-    <meta charset="UTF-8"> <!-- Configura a codificação de caracteres -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Configura a viewport para dispositivos móveis -->
-    <title>Pokedex</title> <!-- Define o título da página -->
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#18271f" />
+    <script>
+      // Apply the saved appearance before the first paint, including file previews.
+      (() => {
+        let preference = "system";
+        try {
+          preference = localStorage.getItem("pokedex.theme.v1");
+        } catch {}
+        const dark =
+          preference === "dark" ||
+          (preference !== "light" &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+        document.documentElement.style.colorScheme = dark ? "dark" : "light";
+      })();
+    </script>
+    <meta
+      name="description"
+      content="Explore o universo Pokémon. Pesquise por nome ou número e descubra tipos, habilidades e atributos na sua Pokédex."
+    />
+    <title>Pokédex — Conheça seu próximo favorito</title>
+    <link rel="icon" href="favicons/favicon-16x16.png" />
+    <link rel="manifest" href="app.webmanifest" />
+    <link rel="apple-touch-icon" href="images/icons/icon-180.png" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="js/script.js"></script>
+  </head>
+  <body>
+    <a href="#main-content" class="skip-content">Pular para o conteúdo</a>
+    <div class="app">
+      <header class="header">
+        <a class="brand" href="./" aria-label="Pokédex, início"
+          ><span class="pokeball" aria-hidden="true"></span>pokédex<span
+            class="brand-dot"
+            >.</span
+          ></a
+        >
+        <nav class="header-nav" aria-label="Navegação principal">
+          <a href="#pokemon-card">Descobrir</a>
+          <a href="#evolution-heading">Evoluções</a>
+          <a href="#team-heading">Equipe</a>
+          <a href="#collection-heading"
+            >Coleção <span aria-hidden="true">→</span></a
+          >
+        </nav>
+        <a class="header-note" href="#notes-heading"
+          ><span class="online-dot" aria-hidden="true"></span> Diário de
+          campo</a
+        >
+        <label class="theme-control" for="theme-select"
+          >Tema
+          <select id="theme-select" aria-describedby="theme-notice">
+            <option value="system">Sistema</option>
+            <option value="light">Claro</option>
+            <option value="dark">Escuro</option>
+          </select>
+        </label>
+      </header>
+      <p id="theme-notice" class="preference-notice" role="status" hidden></p>
 
-    <link rel="icon" href="/favicons/favicon-16x16.png"> <!-- Configura o ícone da página -->
-    <link rel="stylesheet" href="style.css"> <!-- Importa o arquivo CSS -->
-    <script defer src="js/script.js"></script> <!-- Importa o arquivo JavaScript com defer para carregamento assíncrono -->
-</head>
-<body>
-    <main> <!-- Define a seção principal da página -->
-        <img src="#" alt="pokemon" class="pokemon_image"> <!-- Imagem do Pokémon -->
+      <main id="main-content" tabindex="-1">
+        <section class="intro" aria-labelledby="page-title">
+          <p class="eyebrow intro-kicker">
+            <span aria-hidden="true">✦</span> O MUNDO POKÉMON, MAIS PERTO
+          </p>
+          <h1 id="page-title">
+            Sua próxima aventura<br /><span>tem um novo companheiro.</span>
+          </h1>
+          <p class="intro-text">
+            Explore cenários, encontre seus favoritos e descubra a história de
+            cada Pokémon.
+          </p>
+        </section>
 
-        <h1 class="pokemon_data"> <!-- Dados do Pokémon -->
-            <span class="pokemon_number"></span> - <!-- Número do Pokémon -->
-            <span class="pokemon_name"></span> <!-- Nome do Pokémon -->
-        </h1>
-
-        <form class="form"> <!-- Formulário de pesquisa -->
-            <input type="search" class="input_search" placeholder="Name or Number" required> <!-- Caixa de pesquisa -->
-        </form>
-
-        <div class="buttons"> <!-- Botões de navegação -->
-            <button class="button btn-prev">Prev &lt;</button> <!-- Botão de página anterior -->
-            <button class="button btn-next">Next &gt;</button> <!-- Botão de próxima página -->
+        <section class="app-panel" aria-label="Aplicativo e acesso offline">
+          <div class="app-panel-heading">
+            <strong>Sua Pokédex, sempre por perto</strong
+            ><span class="app-panel-actions">
+              <button
+                id="install-app"
+                class="favorite-button"
+                type="button"
+                hidden
+              >
+                Instalar aplicativo
+              </button>
+              <button
+                id="update-app"
+                class="favorite-button"
+                type="button"
+                hidden
+              >
+                Atualizar aplicativo
+              </button>
+              <button
+                id="offline-app-retry"
+                class="text-button"
+                type="button"
+                hidden
+              >
+                Tentar preparar novamente
+              </button>
+            </span>
+          </div>
+          <p id="offline-app-status" class="trainer-help" role="status">
+            Conferindo o acesso offline…
+          </p>
+          <p id="app-install-status" class="trainer-help" role="status"></p>
+          <details id="offline-catalog" hidden>
+            <summary>
+              Pokémon guardados <span id="offline-pokemon-count">0</span>
+            </summary>
+            <p class="trainer-help">
+              Dados e mídias consultados ficam disponíveis neste navegador.
+              Recursos ainda não guardados precisam de conexão. Para instalar,
+              use o botão acima ou a opção de instalação no menu do navegador.
+            </p>
+            <ul
+              id="offline-pokemon-list"
+              class="offline-pokemon-list"
+              aria-label="Pokémon consultados disponíveis offline"
+            ></ul>
+            <button
+              id="offline-app-clear"
+              class="text-button"
+              type="button"
+              disabled
+              hidden
+            >
+              Apagar Pokémon guardados offline
+            </button>
+            <p
+              id="offline-action-status"
+              class="trainer-help"
+              role="status"
+            ></p>
+          </details>
+        </section>
+        <div id="search-section" class="search-row">
+          <div class="search-combobox">
+            <form class="search-form" role="search">
+              <label class="sr-only" for="pokemon-search"
+                >Nome ou número do Pokémon</label
+              >
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <input
+                id="pokemon-search"
+                name="pokemon"
+                type="search"
+                placeholder="Nome ou número. Ex.: pikachu ou 25"
+                autocomplete="off"
+                spellcheck="false"
+                required
+                maxlength="100"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded="false"
+                aria-controls="suggestions-list"
+                aria-describedby="search-help"
+              />
+              <button class="search-button" type="submit">
+                Buscar <span aria-hidden="true">→</span>
+              </button>
+            </form>
+            <p id="search-help" class="sr-only">
+              Digite para ver sugestões. Use as setas para escolher e Enter para
+              abrir, ou busque diretamente.
+            </p>
+            <div id="search-suggestions" class="search-suggestions" hidden>
+              <p id="suggestions-status" role="status"></p>
+              <ul
+                id="suggestions-list"
+                role="listbox"
+                aria-label="Sugestões de busca"
+              ></ul>
+            </div>
+          </div>
+          <button class="random-button" type="button">
+            <span aria-hidden="true">⤨</span> Surpreenda-me
+          </button>
         </div>
-        
-        <img src="/images/pokedex.png" alt="pokedex" class="pokedex"> <!-- Imagem da Pokédex -->
-    </main>
-</body>
+        <div class="quick-picks" role="group" aria-label="Sugestões de Pokémon">
+          <span>Comece por um clássico:</span>
+          <button type="button" data-query="1">
+            <span class="pick-dot" data-pick="grass" aria-hidden="true"></span
+            >Bulbasaur
+          </button>
+          <button type="button" data-query="4">
+            <span class="pick-dot" data-pick="fire" aria-hidden="true"></span
+            >Charmander
+          </button>
+          <button type="button" data-query="7">
+            <span class="pick-dot" data-pick="water" aria-hidden="true"></span
+            >Squirtle
+          </button>
+          <button type="button" data-query="25">
+            <span
+              class="pick-dot"
+              data-pick="electric"
+              aria-hidden="true"
+            ></span
+            >Pikachu
+          </button>
+        </div>
+        <details class="recent-panel">
+          <summary>
+            Vistos recentemente <span id="recent-count">0 / 12</span>
+          </summary>
+          <p class="trainer-help">
+            Retome os Pokémon que você abriu. O histórico fica neste navegador;
+            reabrir um Pokémon sem dados guardados pode precisar de conexão.
+          </p>
+          <div class="recent-controls">
+            <label for="recent-enabled"
+              ><input id="recent-enabled" type="checkbox" checked /> Guardar
+              próximos acessos</label
+            >
+            <button
+              id="recent-clear"
+              class="text-button"
+              type="button"
+              disabled
+            >
+              Limpar histórico
+            </button>
+            <button id="recent-undo" class="text-button" type="button" hidden>
+              Desfazer limpeza
+            </button>
+          </div>
+          <p id="recent-notice" class="storage-notice" role="status" hidden></p>
+          <p id="recent-empty" class="trainer-help">
+            Seu histórico começa quando você abre um Pokémon pela busca ou pelos
+            detalhes da coleção.
+          </p>
+          <ul
+            id="recent-pokemon-list"
+            class="recent-pokemon-list"
+            aria-label="Pokémon vistos recentemente"
+          ></ul>
+          <p id="recent-status" class="trainer-help" role="status"></p>
+        </details>
+        <div class="status-row">
+          <p id="status" role="status" aria-live="polite">
+            Preparando sua Pokédex…
+          </p>
+          <button id="retry" class="text-button" type="button" hidden>
+            Tentar novamente ↻
+          </button>
+        </div>
+
+        <article
+          id="pokemon-card"
+          class="pokemon-card"
+          aria-label="Detalhes do Pokémon"
+          aria-busy="true"
+          data-type="grass"
+        >
+          <section
+            class="pokemon-stage"
+            data-habitat="forest"
+            aria-labelledby="pokemon-name"
+          >
+            <div class="scene-atmosphere" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="stage-top">
+              <span class="scene-badge"
+                ><span class="online-dot" aria-hidden="true"></span
+                ><span id="scene-name">Floresta serena</span></span
+              ><span id="pokemon-number" class="number"># —</span>
+            </div>
+            <div class="artwork">
+              <p
+                id="scene-speech"
+                class="scene-speech"
+                role="status"
+                hidden
+              ></p>
+              <span class="pokemon-shadow" aria-hidden="true"></span>
+              <button
+                id="pokemon-greet"
+                class="pokemon-greet"
+                type="button"
+                aria-label="Interagir com o Pokémon"
+                disabled
+              >
+                <img
+                  id="pokemon-image"
+                  alt=""
+                  width="240"
+                  height="240"
+                  hidden
+                />
+              </button>
+              <span class="scene-sparkle" aria-hidden="true">✦</span>
+              <span id="image-placeholder">Carregando…</span>
+            </div>
+            <p class="scene-hint">
+              Toque no Pokémon e diga olá <span aria-hidden="true">→</span>
+            </p>
+            <div class="stage-bottom">
+              <button
+                id="shiny"
+                class="shiny-button"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                <span aria-hidden="true">✧</span> Shiny
+              </button>
+              <button
+                id="scene-night"
+                class="scene-button"
+                type="button"
+                aria-label="Cenário noturno"
+                aria-pressed="false"
+              >
+                <span aria-hidden="true">☾</span> Noite
+              </button>
+              <button
+                id="pokemon-cry"
+                class="scene-button"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                <span aria-hidden="true">♫</span> Ouvir
+              </button>
+              <button
+                id="scene-motion"
+                class="scene-button"
+                type="button"
+                aria-label="Efeitos de movimento"
+                aria-pressed="true"
+              >
+                <span aria-hidden="true">≈</span> Efeitos
+              </button>
+            </div>
+          </section>
+
+          <section class="pokemon-details">
+            <div class="details-heading">
+              <div>
+                <p class="eyebrow">CONHEÇA SEU POKÉMON</p>
+                <h2 id="pokemon-name" tabindex="-1">Explorando…</h2>
+              </div>
+              <span class="detail-ball pokeball" aria-hidden="true"></span>
+            </div>
+            <div class="identity-row">
+              <ul id="pokemon-types" class="types" aria-label="Tipos"></ul>
+              <button
+                id="favorite"
+                class="favorite-button"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                ♡ Favoritar
+              </button>
+            </div>
+            <div
+              class="pokemon-actions"
+              role="group"
+              aria-label="Usar este Pokémon"
+            >
+              <button
+                id="team-add"
+                class="favorite-button"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                + Adicionar à equipe
+              </button>
+              <button
+                id="compare-add"
+                class="favorite-button"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                ⇄ Comparar
+              </button>
+            </div>
+            <div
+              class="dex-progress-controls"
+              role="group"
+              aria-label="Registrar progresso desta espécie"
+            >
+              <button
+                id="progress-seen"
+                class="favorite-button"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                Marcar como visto
+              </button>
+              <button
+                id="progress-caught"
+                class="favorite-button"
+                type="button"
+                aria-pressed="false"
+                disabled
+              >
+                Marcar captura
+              </button>
+              <p class="trainer-help">
+                Registro manual dos seus jogos, compartilhado entre as formas da
+                espécie.
+              </p>
+              <p
+                id="progress-action-status"
+                class="trainer-help"
+                role="status"
+              ></p>
+            </div>
+            <div id="pokemon-forms" class="pokemon-forms" hidden>
+              <label for="form-select">Formas da espécie</label>
+              <select
+                id="form-select"
+                aria-describedby="forms-status"
+                hidden
+              ></select>
+              <p id="forms-status" role="status"></p>
+              <button id="forms-retry" class="text-button" type="button" hidden>
+                Tentar novamente ↻
+              </button>
+            </div>
+            <dl class="measurements">
+              <div>
+                <dt>ALTURA</dt>
+                <dd id="pokemon-height">—</dd>
+              </div>
+              <div>
+                <dt>PESO</dt>
+                <dd id="pokemon-weight">—</dd>
+              </div>
+              <div>
+                <dt>HABILIDADES</dt>
+                <dd id="pokemon-abilities">—</dd>
+              </div>
+            </dl>
+            <div class="stats-heading">
+              <h3>Atributos base</h3>
+              <span id="stats-total">TOTAL —</span>
+            </div>
+            <ul
+              id="pokemon-stats"
+              class="stats"
+              aria-label="Atributos base"
+            ></ul>
+            <p class="stats-note">Cada Pokémon tem seu jeito de brilhar.</p>
+          </section>
+        </article>
+
+        <nav class="navigation" aria-label="Navegar entre Pokémon">
+          <button id="previous" class="nav-button" type="button" disabled>
+            <span aria-hidden="true">←</span><span>Anterior</span>
+          </button>
+          <span class="navigation-note"
+            ><span aria-hidden="true">← →</span> para explorar
+            <span class="shortcut-divider">/</span> <kbd>/</kbd> para
+            buscar</span
+          >
+          <button id="next" class="nav-button" type="button" disabled>
+            <span>Próximo</span><span aria-hidden="true">→</span>
+          </button>
+        </nav>
+
+        <section
+          class="explore-section species-section"
+          aria-labelledby="species-heading"
+          aria-busy="false"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">HISTÓRIAS DO DIÁRIO DE CAMPO</p>
+              <h2 id="species-heading">Sobre a espécie</h2>
+            </div>
+            <ul
+              id="species-tags"
+              class="types"
+              aria-label="Classificação da espécie"
+            ></ul>
+          </div>
+          <div class="section-status">
+            <p id="species-status" role="status">
+              Selecione um Pokémon para conhecer sua história.
+            </p>
+            <button id="species-retry" class="text-button" type="button" hidden>
+              Tentar novamente ↻
+            </button>
+          </div>
+          <div id="species-content" hidden>
+            <p id="species-description" class="species-description"></p>
+            <p id="species-language" class="species-language"></p>
+            <dl class="species-facts">
+              <div>
+                <dt>Categoria</dt>
+                <dd id="species-genus">—</dd>
+              </div>
+              <div>
+                <dt>Geração</dt>
+                <dd id="species-generation">—</dd>
+              </div>
+              <div>
+                <dt>Habitat registrado</dt>
+                <dd id="species-habitat">—</dd>
+              </div>
+              <div>
+                <dt>Taxa base de captura</dt>
+                <dd id="species-capture">—</dd>
+              </div>
+            </dl>
+            <p class="species-note">
+              A taxa base não representa a chance final de captura; ela também
+              depende das condições do jogo.
+            </p>
+          </div>
+        </section>
+
+        <section
+          class="explore-section field-notes-section"
+          aria-labelledby="notes-heading"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">SEU PRÓPRIO DIÁRIO DE CAMPO</p>
+              <h2 id="notes-heading">Suas anotações</h2>
+            </div>
+            <span id="field-notes-count" class="trainer-count"
+              >0 / 100 espécies</span
+            >
+          </div>
+          <p
+            id="field-notes-notice"
+            class="storage-notice"
+            role="status"
+            hidden
+          ></p>
+          <label
+            id="field-note-context"
+            class="field-note-label"
+            for="field-note"
+            >Selecione um Pokémon para escrever suas anotações.</label
+          >
+          <textarea
+            id="field-note"
+            class="field-note-editor"
+            maxlength="500"
+            rows="5"
+            spellcheck="true"
+            aria-describedby="field-note-help field-note-count field-note-limit"
+            placeholder="Anote estratégias, encontros ou o que torna este Pokémon especial para você."
+            disabled
+          ></textarea>
+          <div class="field-note-toolbar">
+            <span id="field-note-count" class="trainer-help"
+              >0 / 500 caracteres</span
+            ><button
+              id="field-note-delete"
+              class="text-button"
+              type="button"
+              disabled
+            >
+              Apagar nota desta espécie</button
+            ><button
+              id="field-note-undo"
+              class="text-button"
+              type="button"
+              hidden
+            >
+              Desfazer exclusão
+            </button>
+          </div>
+          <p id="field-note-help" class="trainer-help">
+            Salvo automaticamente neste navegador. Todas as formas da espécie
+            compartilham a mesma nota. Use o backup da coleção para transferir
+            suas anotações.
+          </p>
+          <p id="field-note-limit" class="storage-notice" hidden>
+            Você chegou a 100 espécies anotadas. Apague uma nota na lista abaixo
+            para escrever sobre uma nova espécie.
+          </p>
+          <p id="field-note-status" class="trainer-help" role="status"></p>
+          <details class="field-notes-library">
+            <summary>Encontrar anotações salvas</summary>
+            <label for="field-notes-search" class="field-note-label"
+              >Buscar pelo Pokémon ou pelo texto</label
+            ><input
+              id="field-notes-search"
+              type="search"
+              maxlength="100"
+              placeholder="Ex.: Charizard ou estratégia"
+              autocomplete="off"
+            />
+            <p class="trainer-help">
+              Você pode ler as notas mesmo quando os dados do Pokémon não estão
+              disponíveis. O link de cada nota abre os detalhes da espécie.
+            </p>
+            <p id="field-notes-empty" class="trainer-help">
+              Suas anotações salvas aparecerão aqui.
+            </p>
+            <ul
+              id="field-notes-list"
+              class="field-notes-list"
+              aria-label="Anotações salvas por espécie"
+            ></ul>
+          </details>
+        </section>
+        <section
+          class="explore-section matchup-section"
+          aria-labelledby="matchup-heading"
+          aria-busy="false"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">CONHEÇA SEUS PONTOS FORTES</p>
+              <h2 id="matchup-heading">Fraquezas e resistências</h2>
+            </div>
+            <span class="matchup-context">Dano recebido por tipo</span>
+          </div>
+          <div class="section-status">
+            <p id="matchup-status" role="status">
+              Selecione um Pokémon para descobrir suas afinidades.
+            </p>
+            <button id="matchup-retry" class="text-button" type="button" hidden>
+              Tentar novamente ↻
+            </button>
+          </div>
+          <div id="matchup-groups" class="matchup-groups" hidden>
+            <section class="matchup-group" aria-labelledby="weakness-heading">
+              <h3 id="weakness-heading">
+                Fraquezas <span>Recebe mais dano</span>
+              </h3>
+              <ul id="pokemon-weaknesses" aria-label="Fraquezas"></ul>
+            </section>
+            <section class="matchup-group" aria-labelledby="resistance-heading">
+              <h3 id="resistance-heading">
+                Resistências <span>Recebe menos dano</span>
+              </h3>
+              <ul id="pokemon-resistances" aria-label="Resistências"></ul>
+            </section>
+            <section class="matchup-group" aria-labelledby="immunity-heading">
+              <h3 id="immunity-heading">
+                Imunidades <span>Não recebe dano</span>
+              </h3>
+              <ul id="pokemon-immunities" aria-label="Imunidades"></ul>
+            </section>
+          </div>
+          <p class="matchup-note">
+            Tabela de tipos atual, combinando os tipos deste Pokémon.
+            Habilidades, itens e efeitos de batalha podem alterar o resultado.
+          </p>
+        </section>
+
+        <section
+          class="explore-section evolution-section"
+          aria-labelledby="evolution-heading"
+          aria-busy="false"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">CADA JORNADA TEM UMA HISTÓRIA</p>
+              <h2 id="evolution-heading">Linha evolutiva</h2>
+            </div>
+          </div>
+          <div class="section-status">
+            <p id="evolution-status" role="status">
+              Selecione um Pokémon para conhecer sua família.
+            </p>
+            <button
+              id="evolution-retry"
+              class="text-button"
+              type="button"
+              hidden
+            >
+              Tentar novamente ↻
+            </button>
+          </div>
+          <ul
+            id="evolution-tree"
+            class="evolution-tree"
+            aria-label="Família evolutiva"
+          ></ul>
+          <p class="evolution-note">
+            As condições podem variar por jogo. Quando disponíveis, as
+            alternativas aparecem abaixo de cada etapa.
+          </p>
+        </section>
+
+        <section
+          class="explore-section trainer-section"
+          aria-labelledby="team-heading"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">COMPANHEIROS DE AVENTURA</p>
+              <h2 id="team-heading" tabindex="-1">Minha equipe</h2>
+            </div>
+            <span id="team-count" class="trainer-count">0 / 6 integrantes</span>
+          </div>
+          <div class="team-toolbar">
+            <button
+              id="team-image-export"
+              class="favorite-button"
+              type="button"
+              disabled
+            >
+              Exportar imagem da equipe
+            </button>
+            <button
+              id="team-share"
+              class="favorite-button"
+              type="button"
+              disabled
+            >
+              ↗ Compartilhar equipe
+            </button>
+            <details class="team-import">
+              <summary>Importar equipe</summary>
+              <form id="team-import-form" class="team-import-form">
+                <label for="team-import-value">Link ou código da equipe</label>
+                <input
+                  id="team-import-value"
+                  type="text"
+                  maxlength="2048"
+                  placeholder="Cole o link ou código recebido"
+                  required
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+                <button class="favorite-button" type="submit">
+                  Conferir equipe →
+                </button>
+              </form>
+            </details>
+          </div>
+          <div id="team-share-output" class="team-share-output" hidden>
+            <label id="team-share-label" for="team-share-value"
+              >Link da equipe</label
+            >
+            <div class="share-copy-row">
+              <input
+                id="team-share-value"
+                type="text"
+                readonly
+                spellcheck="false"
+              />
+              <button id="team-copy" class="favorite-button" type="button">
+                Copiar
+              </button>
+            </div>
+            <p id="team-share-status" class="trainer-help" role="status"></p>
+          </div>
+          <div id="team-image-panel" class="team-image-panel" hidden>
+            <label for="team-image-title">Título da imagem</label>
+            <div class="saved-team-input-row">
+              <input
+                id="team-image-title"
+                type="text"
+                maxlength="40"
+                value="Minha equipe Pokémon"
+              /><button
+                id="team-image-generate"
+                class="favorite-button"
+                type="button"
+              >
+                Gerar PNG
+              </button>
+            </div>
+            <p id="team-image-status" class="trainer-help" role="status"></p>
+            <img
+              id="team-image-preview"
+              class="team-image-preview"
+              alt=""
+              hidden
+            />
+            <a id="team-image-download" class="favorite-button" download hidden
+              >Baixar PNG</a
+            >
+          </div>
+          <section
+            id="shared-team-panel"
+            class="shared-team-panel"
+            aria-labelledby="shared-team-heading"
+            hidden
+          >
+            <p class="eyebrow">UMA NOVA AVENTURA EM COMPANHIA</p>
+            <h3 id="shared-team-heading" tabindex="-1">Equipe compartilhada</h3>
+            <p id="shared-team-status" class="trainer-help" role="status"></p>
+            <ul
+              id="shared-team-list"
+              class="shared-team-list"
+              aria-label="Integrantes da equipe recebida"
+            ></ul>
+            <div class="shared-team-actions">
+              <button
+                id="shared-team-import"
+                class="favorite-button"
+                type="button"
+                disabled
+              >
+                Carregar no lugar da equipe atual
+              </button>
+              <button
+                id="shared-team-retry"
+                class="text-button"
+                type="button"
+                hidden
+              >
+                Tentar novamente ↻
+              </button>
+              <button id="shared-team-cancel" class="text-button" type="button">
+                Cancelar
+              </button>
+            </div>
+          </section>
+          <p
+            id="team-storage-notice"
+            class="storage-notice"
+            role="status"
+            hidden
+          ></p>
+          <div class="section-status">
+            <p id="team-status" role="status">
+              Escolha um Pokémon e use “Adicionar à equipe”.
+            </p>
+            <button id="team-retry" class="text-button" type="button" hidden>
+              Tentar novamente ↻
+            </button>
+          </div>
+          <ul
+            id="team-list"
+            class="team-list"
+            aria-label="Integrantes da equipe"
+          ></ul>
+          <details class="saved-teams-panel">
+            <summary>
+              Equipes nomeadas
+              <span id="saved-teams-count">0 / 20 equipes</span>
+            </summary>
+            <p class="trainer-help">
+              Guarde suas combinações favoritas. Carregar uma equipe troca a
+              seleção atual; atualizar grava as mudanças na equipe nomeada
+              escolhida.
+            </p>
+            <p
+              id="saved-teams-notice"
+              class="storage-notice"
+              role="status"
+              hidden
+            ></p>
+            <form id="save-team-form" class="saved-team-form">
+              <label for="new-team-name">Nome da nova equipe</label>
+              <div class="saved-team-input-row">
+                <input
+                  id="new-team-name"
+                  type="text"
+                  placeholder="Ex.: Equipe de Kanto"
+                  maxlength="40"
+                  required
+                  autocomplete="off"
+                />
+                <button
+                  id="saved-team-save"
+                  class="favorite-button"
+                  type="submit"
+                  disabled
+                >
+                  Salvar como nova
+                </button>
+              </div>
+            </form>
+            <label class="saved-team-label" for="saved-team-select"
+              >Equipes salvas</label
+            >
+            <select id="saved-team-select" disabled>
+              <option value="">Escolha uma equipe salva</option>
+            </select>
+            <ul
+              id="saved-team-preview"
+              class="saved-team-preview"
+              aria-label="Pokémon da equipe nomeada escolhida"
+            ></ul>
+            <div class="saved-team-actions">
+              <button
+                id="saved-team-load"
+                class="favorite-button"
+                type="button"
+                disabled
+              >
+                Carregar
+              </button>
+              <button
+                id="saved-team-update"
+                class="favorite-button"
+                type="button"
+                disabled
+              >
+                Atualizar com equipe atual
+              </button>
+              <button
+                id="saved-team-delete"
+                class="text-button"
+                type="button"
+                disabled
+              >
+                Excluir equipe salva
+              </button>
+            </div>
+            <p id="saved-team-dirty" class="trainer-help"></p>
+            <form id="rename-team-form" class="saved-team-form">
+              <label for="saved-team-rename">Renomear equipe selecionada</label>
+              <div class="saved-team-input-row">
+                <input
+                  id="saved-team-rename"
+                  type="text"
+                  maxlength="40"
+                  required
+                  autocomplete="off"
+                  disabled
+                />
+                <button
+                  id="saved-team-rename-button"
+                  class="favorite-button"
+                  type="submit"
+                  disabled
+                >
+                  Renomear
+                </button>
+              </div>
+            </form>
+            <p id="saved-team-status" class="trainer-help" role="status"></p>
+            <div id="saved-team-undo-panel" class="saved-team-undo" hidden>
+              <p
+                id="saved-team-undo-status"
+                class="trainer-help"
+                role="status"
+              ></p>
+              <button id="saved-team-undo" class="text-button" type="button">
+                Desfazer exclusão
+              </button>
+            </div>
+          </details>
+          <section class="team-advisor" aria-labelledby="team-advisor-heading">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">UMA EQUIPE QUE SE COMPLETA</p>
+                <h3 id="team-advisor-heading">Encontre seu próximo parceiro</h3>
+              </div>
+              <button
+                id="team-suggest"
+                class="favorite-button"
+                type="button"
+                disabled
+              >
+                Encontrar parceiros
+              </button>
+            </div>
+            <p id="team-advisor-status" class="trainer-help" role="status">
+              Monte uma equipe para descobrir combinações.
+            </p>
+            <ul
+              id="team-suggestions"
+              class="team-suggestions"
+              aria-label="Sugestões de parceiros"
+            ></ul>
+            <p class="trainer-help">
+              Sugestões defensivas por tipos em uma coleção de 43 Pokémon.
+              Priorizam ameaças a mais integrantes e tipos sem resistência na
+              equipe. Habilidades, itens, golpes e regras de cada jogo podem
+              mudar a escolha.
+            </p>
+          </section>
+          <details id="team-defense" class="team-defense" hidden>
+            <summary>Mapa defensivo da equipe · 18 tipos</summary>
+            <p class="trainer-help">
+              Compare o dano recebido por cada integrante. Deslize a tabela para
+              os lados para ver todos os parceiros.
+            </p>
+            <div
+              class="team-defense-scroll"
+              role="region"
+              aria-label="Tabela de dano recebido pela equipe"
+              tabindex="0"
+            >
+              <table id="team-defense-table"></table>
+            </div>
+          </details>
+          <div id="team-analysis" class="team-analysis" hidden>
+            <h3>Fraquezas compartilhadas</h3>
+            <p id="team-analysis-status" class="trainer-help"></p>
+            <ul
+              id="team-weaknesses"
+              class="team-weaknesses"
+              aria-label="Tipos que ameaçam mais de um integrante"
+            ></ul>
+            <p class="trainer-help">
+              A análise considera apenas os tipos dos integrantes disponíveis.
+              Habilidades, itens e efeitos de batalha podem alterar os
+              resultados.
+            </p>
+          </div>
+        </section>
+
+        <section
+          class="explore-section trainer-section"
+          aria-labelledby="comparison-heading"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">CADA PARCEIRO TEM SEU JEITO</p>
+              <h2 id="comparison-heading" tabindex="-1">Comparar Pokémon</h2>
+            </div>
+            <button id="compare-clear" class="text-button" type="button" hidden>
+              Limpar comparação
+            </button>
+          </div>
+          <div class="section-status">
+            <p id="comparison-status" role="status">
+              Selecione dois Pokémon pelo botão “Comparar” nos detalhes.
+            </p>
+          </div>
+          <div id="comparison-slots" class="comparison-slots"></div>
+          <div id="comparison-results" class="comparison-results" hidden>
+            <table id="comparison-table">
+              <caption class="sr-only">
+                Comparação dos atributos base dos dois Pokémon selecionados
+              </caption>
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+            <p class="trainer-help">
+              O destaque indica o maior atributo base. Isso não determina o
+              resultado de uma batalha.
+            </p>
+          </div>
+          <div id="comparison-details" hidden>
+            <div id="comparison-profiles" class="comparison-profiles"></div>
+            <h3 class="comparison-defense-heading">Afinidades lado a lado</h3>
+            <div class="section-status">
+              <p id="comparison-matchups-status" role="status"></p>
+              <button
+                id="comparison-matchups-retry"
+                class="text-button"
+                type="button"
+                hidden
+              >
+                Tentar novamente ↻
+              </button>
+            </div>
+            <table
+              id="comparison-matchups-table"
+              class="comparison-matchups-table"
+              hidden
+            >
+              <caption class="sr-only">
+                Multiplicadores de dano recebido por tipo de ataque. Um
+                multiplicador menor significa menos dano recebido pela
+                combinação de tipos.
+              </caption>
+              <thead></thead>
+              <tbody></tbody>
+            </table>
+            <p class="trainer-help">
+              As habilidades estão listadas como fornecidas pela PokéAPI;
+              “Oculta” identifica uma habilidade oculta. Os multiplicadores usam
+              apenas os tipos atuais: habilidades, itens e efeitos de batalha
+              podem alterar o resultado.
+            </p>
+          </div>
+        </section>
+
+        <section
+          id="attack-coverage"
+          class="explore-section attack-coverage"
+          aria-labelledby="attack-heading"
+          aria-busy="false"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">ESCOLHA COMO ENTRAR NA BATALHA</p>
+              <h2 id="attack-heading">Cobertura de ataques</h2>
+            </div>
+            <span id="attack-choice-count" class="trainer-count"
+              >0 / 4 tipos</span
+            >
+          </div>
+          <p class="trainer-help">
+            Compare até quatro tipos de ataque e descubra a melhor opção contra
+            cada tipo defensor. As escolhas são livres; confira quais golpes seu
+            Pokémon aprende no jogo.
+          </p>
+          <fieldset class="attack-choices">
+            <legend class="sr-only">Tipos dos ataques para comparar</legend>
+            <label for="attack-type-1"
+              >Ataque 1<select id="attack-type-1" class="attack-type-select">
+                <option value="">Sem tipo escolhido</option>
+              </select></label
+            >
+            <label for="attack-type-2"
+              >Ataque 2<select id="attack-type-2" class="attack-type-select">
+                <option value="">Sem tipo escolhido</option>
+              </select></label
+            >
+            <label for="attack-type-3"
+              >Ataque 3<select id="attack-type-3" class="attack-type-select">
+                <option value="">Sem tipo escolhido</option>
+              </select></label
+            >
+            <label for="attack-type-4"
+              >Ataque 4<select id="attack-type-4" class="attack-type-select">
+                <option value="">Sem tipo escolhido</option>
+              </select></label
+            >
+          </fieldset>
+          <div class="attack-actions">
+            <button
+              id="attack-use-current"
+              class="favorite-button"
+              type="button"
+              disabled
+            >
+              Usar tipos do Pokémon aberto
+            </button>
+            <button
+              id="attack-clear"
+              class="text-button"
+              type="button"
+              disabled
+            >
+              Limpar tipos de ataque
+            </button>
+          </div>
+          <p
+            id="attack-coverage-notice"
+            class="storage-notice"
+            role="status"
+            hidden
+          ></p>
+          <div class="section-status">
+            <p id="attack-coverage-status" role="status">
+              Escolha de um a quatro tipos de ataque para comparar a cobertura.
+            </p>
+            <button
+              id="attack-coverage-retry"
+              class="text-button"
+              type="button"
+              hidden
+            >
+              Tentar novamente ↻
+            </button>
+          </div>
+          <div id="attack-coverage-results" hidden>
+            <dl class="attack-counts">
+              <div>
+                <dt>Super eficaz</dt>
+                <dd id="attack-count-super">0</dd>
+              </div>
+              <div>
+                <dt>Dano neutro</dt>
+                <dd id="attack-count-neutral">0</dd>
+              </div>
+              <div>
+                <dt>Resistência</dt>
+                <dd id="attack-count-resistant">0</dd>
+              </div>
+              <div>
+                <dt>Imunidade</dt>
+                <dd id="attack-count-immune">0</dd>
+              </div>
+            </dl>
+            <p class="trainer-help">
+              Contagem dos 18 tipos defensivos isolados, considerando o melhor
+              ataque escolhido. ×0: imune; abaixo de ×1: resistente; ×1: neutro;
+              acima de ×1: super eficaz.
+            </p>
+            <section
+              id="attack-target"
+              class="attack-target"
+              aria-labelledby="attack-target-heading"
+              hidden
+            >
+              <div class="section-heading">
+                <div>
+                  <p class="eyebrow">CONTRA O POKÉMON ABERTO</p>
+                  <h3 id="attack-target-heading">
+                    <span id="attack-target-name"></span>
+                  </h3>
+                  <p id="attack-target-types" class="trainer-help"></p>
+                </div>
+                <strong id="attack-target-best"></strong>
+              </div>
+              <ul
+                id="attack-target-options"
+                class="attack-target-options"
+                aria-label="Dano de cada tipo escolhido contra o Pokémon aberto"
+              ></ul>
+            </section>
+            <details class="attack-table-details">
+              <summary>Ver tabela de cobertura · 18 tipos</summary>
+              <p class="trainer-help">
+                Deslize a tabela para ver todos os ataques. Com a tabela em
+                foco, use as setas para mover as colunas.
+              </p>
+              <div
+                class="attack-table-scroll"
+                role="region"
+                aria-label="Tabela de cobertura de ataques"
+                tabindex="0"
+              >
+                <table id="attack-coverage-table"></table>
+              </div>
+            </details>
+          </div>
+          <p class="trainer-help">
+            A melhor opção é um ataque por vez; os tipos dos ataques não são
+            multiplicados entre si. O alvo combina seus tipos defensivos. A
+            tabela atual considera apenas tipos, sem habilidades, itens, poder
+            dos golpes ou bônus de mesmo tipo (STAB).
+          </p>
+        </section>
+        <section class="explore-section" aria-labelledby="collection-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">ENCONTRE SEU PRÓXIMO FAVORITO</p>
+              <h2 id="collection-heading" tabindex="-1">Explore a coleção</h2>
+            </div>
+            <button
+              id="favorites-only"
+              class="favorite-button"
+              type="button"
+              aria-pressed="false"
+            >
+              ♡ Favoritos <span id="favorite-count">0</span>
+            </button>
+          </div>
+          <p
+            id="favorites-notice"
+            class="storage-notice"
+            role="status"
+            hidden
+          ></p>
+          <p class="trainer-help">
+            <a href="#backup-heading"
+              >Guardar ou transferir sua coleção → Fazer backup</a
+            >
+          </p>
+          <p
+            id="progress-notice"
+            class="storage-notice"
+            role="status"
+            hidden
+          ></p>
+          <div class="collection-filters">
+            <label for="type-filter"
+              >Tipo<select id="type-filter">
+                <option value="">Todos os tipos</option>
+              </select></label
+            >
+            <label for="generation-filter"
+              >Geração<select id="generation-filter">
+                <option value="">Todas as gerações</option>
+                <option value="1">1ª geração · Kanto</option>
+                <option value="2">2ª geração · Johto</option>
+                <option value="3">3ª geração · Hoenn</option>
+                <option value="4">4ª geração · Sinnoh</option>
+                <option value="5">5ª geração · Unova</option>
+                <option value="6">6ª geração · Kalos</option>
+                <option value="7">7ª geração · Alola</option>
+                <option value="8">8ª geração · Galar / Hisui</option>
+                <option value="9">9ª geração · Paldea</option>
+              </select></label
+            >
+            <label for="progress-filter"
+              >Progresso<select id="progress-filter">
+                <option value="">Todos os registros</option>
+                <option value="seen">Vistos, incluindo capturados</option>
+                <option value="caught">Capturados</option>
+                <option value="unseen">Ainda não vistos</option>
+                <option value="uncaught">Faltam capturar</option>
+              </select></label
+            >
+            <button id="clear-filters" class="text-button" type="button">
+              Limpar filtros
+            </button>
+          </div>
+          <details class="advanced-filter-panel">
+            <summary>
+              Filtros avançados <span>Categoria, habitat e atributos</span>
+            </summary>
+            <form id="advanced-filters">
+              <div class="advanced-filter-grid">
+                <label for="category-filter"
+                  >Categoria<select id="category-filter">
+                    <option value="">Todas as categorias</option>
+                    <option value="legendary">Lendários</option>
+                    <option value="mythical">Míticos</option>
+                    <option value="baby">Pokémon bebês</option>
+                  </select></label
+                >
+                <label for="habitat-filter"
+                  >Habitat registrado<select id="habitat-filter">
+                    <option value="">Todos os habitats</option>
+                  </select></label
+                >
+                <label for="sort-filter"
+                  >Ordenar por<select id="sort-filter">
+                    <option value="number">Número da Pokédex</option>
+                    <option value="name">Nome (A–Z)</option>
+                    <option value="stat-desc">Atributo: maior primeiro</option>
+                    <option value="stat-asc">Atributo: menor primeiro</option>
+                  </select></label
+                >
+                <label for="stat-filter"
+                  >Atributo base<select id="stat-filter"></select
+                ></label>
+                <label for="stat-min"
+                  >Valor mínimo<input
+                    id="stat-min"
+                    type="number"
+                    min="0"
+                    max="1530"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="Sem mínimo"
+                /></label>
+                <label for="stat-max"
+                  >Valor máximo<input
+                    id="stat-max"
+                    type="number"
+                    min="0"
+                    max="1530"
+                    step="1"
+                    inputmode="numeric"
+                    placeholder="Sem máximo"
+                /></label>
+              </div>
+              <div class="advanced-filter-actions">
+                <button class="favorite-button" type="submit">
+                  Aplicar filtros
+                </button>
+                <p
+                  id="advanced-filter-status"
+                  class="trainer-help"
+                  role="status"
+                ></p>
+              </div>
+              <p class="trainer-help">
+                Valores base da forma selecionada. Dados dos filtros atualizados
+                em <span id="filter-data-date"></span>.
+              </p>
+            </form>
+          </details>
+          <p id="advanced-filter-summary" class="trainer-help">
+            Nenhum filtro avançado aplicado.
+          </p>
+          <details class="filter-presets-panel">
+            <summary>
+              Minhas buscas salvas <span id="filter-preset-count">0 / 8</span>
+            </summary>
+            <p class="trainer-help">
+              Guarde uma combinação com nome para retomá-la depois. São salvos
+              os filtros em uso, incluindo favoritos e ordenação. Se editou os
+              filtros avançados, use “Aplicar filtros” antes de salvar.
+            </p>
+            <p
+              id="filter-preset-notice"
+              class="storage-notice"
+              role="status"
+              hidden
+            ></p>
+            <form id="filter-preset-form" class="filter-preset-form">
+              <label for="filter-preset-name">Nome da busca</label>
+              <div class="filter-preset-input-row">
+                <input
+                  id="filter-preset-name"
+                  type="text"
+                  maxlength="40"
+                  required
+                  autocomplete="off"
+                  placeholder="Ex.: Favoritos de água"
+                />
+                <button class="favorite-button" type="submit">
+                  Salvar filtros em uso
+                </button>
+              </div>
+            </form>
+            <label class="filter-preset-label" for="filter-preset-select"
+              >Buscas salvas</label
+            >
+            <select id="filter-preset-select" disabled>
+              <option value="">Escolha uma busca salva</option>
+            </select>
+            <p id="filter-preset-description" class="trainer-help"></p>
+            <div class="filter-preset-actions">
+              <button
+                id="filter-preset-load"
+                class="favorite-button"
+                type="button"
+                disabled
+              >
+                Aplicar busca salva
+              </button>
+              <button
+                id="filter-preset-delete"
+                class="text-button"
+                type="button"
+                disabled
+              >
+                Excluir busca salva
+              </button>
+              <button
+                id="filter-preset-undo"
+                class="text-button"
+                type="button"
+                hidden
+              >
+                Desfazer exclusão
+              </button>
+            </div>
+            <p id="filter-preset-status" class="trainer-help" role="status"></p>
+            <p class="trainer-help">
+              As combinações ficam neste navegador. Histórico e buscas salvas
+              não fazem parte do arquivo de backup da coleção. Os resultados
+              podem mudar conforme a coleção e seus favoritos.
+            </p>
+          </details>
+          <p
+            id="collection-filter-notice"
+            class="storage-notice"
+            role="status"
+            hidden
+          ></p>
+          <section
+            id="collection-progress-summary"
+            class="collection-progress-summary"
+            aria-labelledby="collection-progress-heading"
+            hidden
+          >
+            <div class="section-heading">
+              <h3 id="collection-progress-heading">Progresso nesta seleção</h3>
+              <span id="progress-percentage" class="trainer-help"></span>
+            </div>
+            <dl class="progress-counts">
+              <div>
+                <dt>Espécies vistas</dt>
+                <dd id="progress-seen-count">0</dd>
+              </div>
+              <div>
+                <dt>Capturadas</dt>
+                <dd id="progress-caught-count">0</dd>
+              </div>
+              <div>
+                <dt>Espécies na seleção</dt>
+                <dd id="progress-total-count">0</dd>
+              </div>
+            </dl>
+            <progress
+              id="progress-meter"
+              max="1"
+              value="0"
+              aria-label="Espécies capturadas nesta seleção"
+            ></progress>
+            <p class="trainer-help">
+              Conta as espécies após os filtros de tipo, geração, favoritos e
+              atributos, antes do filtro de progresso. Formas da mesma espécie
+              contam uma vez. Use os botões “Visto” e “Marcar captura” nos
+              detalhes para registrar seus encontros nos jogos.
+            </p>
+          </section>
+          <div class="section-status">
+            <p id="collection-status" role="status">Carregando o catálogo…</p>
+            <button
+              id="collection-retry"
+              class="text-button"
+              type="button"
+              hidden
+            >
+              Tentar novamente ↻
+            </button>
+          </div>
+          <div id="collection-results" aria-busy="true">
+            <ul
+              id="collection-list"
+              class="collection-list"
+              aria-label="Pokémon da coleção"
+            ></ul>
+          </div>
+          <nav
+            class="collection-pagination"
+            aria-label="Páginas da coleção"
+            hidden
+          >
+            <button id="collection-previous" class="nav-button" type="button">
+              ← Anterior
+            </button>
+            <span id="collection-page"></span>
+            <button id="collection-next" class="nav-button" type="button">
+              Próxima →
+            </button>
+          </nav>
+        </section>
+        <section
+          class="explore-section backup-section"
+          aria-labelledby="backup-heading"
+        >
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">SUAS AVENTURAS, SEM PERDER NADA</p>
+              <h2 id="backup-heading" tabindex="-1">Backup da coleção</h2>
+            </div>
+          </div>
+          <p class="trainer-help">
+            Guarde favoritos, progresso, anotações, equipe atual e equipes
+            nomeadas em um arquivo para usar em outra Pokédex. O arquivo é lido
+            neste navegador, sem envio para um servidor.
+          </p>
+          <div class="backup-export-row">
+            <button id="backup-export" class="favorite-button" type="button">
+              Exportar backup
+            </button>
+            <a id="backup-download" class="text-button" download hidden
+              >Baixar arquivo</a
+            >
+          </div>
+          <div class="backup-import-area">
+            <label for="backup-file">Importar arquivo de backup</label>
+            <input
+              id="backup-file"
+              type="file"
+              accept=".json,application/json"
+              aria-describedby="backup-file-help"
+            />
+            <p id="backup-file-help" class="trainer-help">
+              Escolha um backup JSON da Pokédex de até 1 MB.
+            </p>
+            <fieldset class="backup-modes">
+              <legend>Como importar</legend>
+              <label
+                ><input
+                  type="radio"
+                  name="backup-mode"
+                  value="merge"
+                  checked
+                />Mesclar e preservar os dados atuais</label
+              >
+              <label
+                ><input
+                  type="radio"
+                  name="backup-mode"
+                  value="replace"
+                />Substituir pelos dados do arquivo (confira a prévia)</label
+              >
+            </fieldset>
+          </div>
+          <p id="backup-status" class="trainer-help" role="status"></p>
+          <div id="backup-preview" class="backup-preview" hidden>
+            <h3>Prévia da importação</h3>
+            <p class="trainer-help">
+              Arquivo exportado em <span id="backup-exported-at"></span>.
+            </p>
+            <ul id="backup-summary" class="backup-summary"></ul>
+            <h4>Equipes nomeadas após a importação</h4>
+            <ul id="backup-team-names" class="saved-team-preview"></ul>
+            <div class="backup-actions">
+              <button
+                id="backup-import"
+                class="favorite-button"
+                type="button"
+                disabled
+              >
+                Mesclar backup
+              </button>
+              <button id="backup-cancel" class="text-button" type="button">
+                Cancelar
+              </button>
+            </div>
+          </div>
+          <button id="backup-undo" class="text-button" type="button" hidden>
+            Desfazer última importação
+          </button>
+        </section>
+        <noscript
+          ><p class="noscript">
+            Ative o JavaScript para pesquisar e explorar os Pokémon.
+          </p></noscript
+        >
+      </main>
+
+      <nav
+        id="section-dock"
+        class="section-dock"
+        aria-label="Atalhos da Pokédex"
+        hidden
+      >
+        <button
+          id="section-menu-open"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="section-menu"
+          aria-expanded="false"
+        >
+          <span aria-hidden="true">☷</span> Seções
+        </button>
+        <span class="section-dock-current"
+          ><small>Você está em</small
+          ><strong id="section-current">Busca</strong></span
+        >
+        <button
+          id="section-search"
+          type="button"
+          aria-label="Voltar à busca de Pokémon"
+        >
+          <span aria-hidden="true">⌕</span> Buscar
+        </button>
+      </nav>
+      <dialog
+        id="section-menu"
+        class="section-menu"
+        aria-labelledby="section-menu-title"
+        aria-describedby="section-menu-description"
+      >
+        <div class="section-menu-heading">
+          <div>
+            <p class="eyebrow">SUA PRÓXIMA PARADA</p>
+            <h2 id="section-menu-title">Explore a Pokédex</h2>
+          </div>
+          <button
+            id="section-menu-close"
+            class="text-button"
+            type="button"
+            aria-label="Fechar menu de seções"
+          >
+            ×
+          </button>
+        </div>
+        <p id="section-menu-description" class="trainer-help">
+          Atalhos para descobrir Pokémon, montar sua equipe e cuidar da coleção.
+        </p>
+        <nav aria-label="Seções da Pokédex" class="section-menu-links">
+          <ol id="section-menu-list" class="section-menu-list"></ol>
+        </nav>
+        <p class="section-menu-hint">
+          <span id="section-menu-scroll-hint" hidden></span>
+          <span>Pressione Esc para fechar ou toque fora do painel.</span>
+        </p>
+      </dialog>
+      <footer>
+        <span>Feito para quem nunca deixou de explorar.</span
+        ><span
+          >Dados da
+          <a
+            href="https://pokeapi.co/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >PokéAPI →</a
+          ><span class="footer-divider">/</span>Projeto de fã, sem afiliação à
+          Nintendo.</span
+        >
+      </footer>
+    </div>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  </body>
 </html>

@@ -1,0 +1,7 @@
+# Generated single-file preview; rebuild after changing the application.
+/preview.html
+/preview-offline.html
+/.preview-data.json
+/.preview-cache/
+/dist/
+/pokedex-site.zip
