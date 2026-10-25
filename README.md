@@ -16,6 +16,8 @@ Abra a página servida na porta 8000 no seu navegador. Também é possível usar
 
 O fluxo `.github/workflows/pages.yml` usa Node.js 24 na validação e nas ações de publicação, valida as regras e prepara o site em cada alteração enviada para `main`. Em pull requests, executa a validação sem publicar. Para habilitar a publicação, abra **Settings → Pages** no repositório e escolha **GitHub Actions** em **Source**. Depois envie as alterações para `main` ou execute **Actions → Publish Pokédex → Run workflow**. A publicação usa as permissões temporárias do próprio GitHub, sem chaves adicionais.
 
+A publicação também aguarda o trabalho `browser`: cinco suítes Playwright com Chromium verificam busca, coleção, evoluções, cenários, interação e estabilidade da paginação no pacote real do site. Falhas impedem o deploy. Logs e um resumo ficam no artefato `browser-test-results`; falhas da paginação incluem captura de tela e trace do Playwright. Essa verificação não depende da PokéAPI nem dos arquivos locais de demonstração.
+
 O endereço padrão deste repositório é `https://viniciuslks7.github.io/Pokedex/`, disponível depois que o trabalho de publicação terminar com sucesso. A interface usa caminhos relativos, incluindo o manifesto e o service worker. Ao atualizar, quem já usa o aplicativo pode receber a opção “Atualizar aplicativo”.
 
 Para preparar a mesma versão localmente, sem instalar dependências:
@@ -229,12 +231,16 @@ Elas verificam multiplicadores de tipos duplos, neutralizações e imunidades, f
 Os testes de navegador em `tests/browser.cjs`, `tests/exploration.cjs`, `tests/visual.cjs` e `tests/strategy.cjs` usam Playwright e respostas simuladas da API. Com o servidor iniciado, instale as ferramentas de teste fora do projeto e execute:
 
 ```sh
-npm install --prefix /tmp/pokedex-browser-tests --no-audit --no-fund playwright axe-core@4.11.0
+npm install --prefix /tmp/pokedex-browser-tests --no-audit --no-fund playwright@1.62.1 axe-core@4.11.0
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node /tmp/pokedex-browser-tests/node_modules/playwright/cli.js install chromium
+# A mesma verificação usada no CI, com build e servidor próprios:
+NODE_PATH=/tmp/pokedex-browser-tests/node_modules node scripts/test-browser.cjs
+# Ou as suítes individuais, com o servidor manual já iniciado:
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/browser.cjs
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/exploration.cjs
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/visual.cjs
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/strategy.cjs
+NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/scroll-stability.cjs
 # Depois de gerar preview.html:
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/preview.cjs
 # Depois de gerar preview-offline.html:
@@ -284,5 +290,7 @@ A suíte `tests/field-notes.cjs` verifica salvamento automático e posição do 
 A suíte `tests/pwa.cjs` usa um service worker real em um subdiretório, valida o manifesto e os ícones, bloqueia as requisições externas e recarrega a página sem rede. Confere consultas por nome, imagens, dados de espécie e tipos, áudio com intervalos de bytes, exportação PNG com recursos guardados, mensagens para consultas não armazenadas, limpeza sem perder favoritos/equipes, atualização real do worker e falha na instalação. A interação com o convite de instalação é simulada; o teste não instala um aplicativo no sistema operacional. As demais suítes bloqueiam service workers para manter as respostas simuladas da API isoladas.
 
 A suíte `tests/accessibility.cjs` usa axe-core para verificar critérios automatizáveis WCAG 2.1 A/AA nos temas claro e escuro, em 375 e 1.440 pixels: página inicial, menu de seções e controles após favoritar, adicionar à equipe, escrever uma nota e abrir os filtros. Exige zero erros de JavaScript e zero consultas externas. O relatório em `/tmp/pokedex-accessibility-results.json` também registra verificações inconclusivas que precisam de avaliação manual; a auditoria automatizada não substitui testes com leitores de tela e pessoas com deficiência.
+
+A suíte `tests/scroll-stability.cjs` clica nas mesmas coordenadas da paginação, sem a rolagem automática de `locator.click()`. Percorre as 86 páginas de um catálogo simulado de 1.025 Pokémon e testa páginas finais menores, retorno, Enter/Espaço, foco e seleção de Pokémon. Inclui mouse, toque, desktop/celular e movimento reduzido. Os controles permanecem no lugar ao paginar; escolher um Pokémon continua levando aos seus detalhes.
 
 Projeto de fã, sem afiliação à Nintendo, Game Freak ou The Pokémon Company.

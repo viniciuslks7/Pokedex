@@ -30,6 +30,19 @@ As suítes responsivas percorrem larguras de 320 a 1.440 pixels. O menu inclui v
 - Os testes de visualizadores isolados usam um iframe do tamanho da janela, mantendo o sandbox e o bloqueio de armazenamento; cliques continuam sujeitos às verificações normais de visibilidade e obstrução.
 - Uma nova suíte de acessibilidade permite repetir a auditoria e registra verificações inconclusivas para avaliação manual.
 
+## Regressão de paginação e testes contínuos
+
+Rodada adicional em 25/10/2026, sobre o commit `b4f2c8e`, com as correções desta entrega e revisão offline `e43e100a8e0241b7`.
+
+O teste novo reproduziu o botão “Próxima” da coleção saindo da posição em 463 pixels, porque a paginação focava e rolava até o título da coleção. A correção mantém o foco no controle e compensa diferenças de altura da página final, preservando a posição dos botões na janela.
+
+- As cinco suítes de `scripts/test-browser.cjs` passaram no pacote real de `dist/`: busca, exploração, cenários, estratégia e estabilidade da rolagem.
+- O teste novo percorreu as 86 páginas de um catálogo simulado de 1.025 Pokémon com cliques nas mesmas coordenadas. Também verificou toque, Enter/Espaço, movimento reduzido, páginas finais menores e seleção intencional de Pokémon para abrir os detalhes.
+- As suítes de compartilhamento/filtros, histórico/buscas salvas e prévia offline passaram novamente após a correção.
+- Os 68 testes de regras passaram novamente.
+
+O trabalho `browser` do GitHub Actions instala Playwright 1.62.1 e Chromium em Ubuntu 24.04, executa as cinco suítes sem precisar dos dados locais de demonstração e guarda logs e resumo no artefato `browser-test-results`. A publicação agora depende tanto desse trabalho quanto da validação de regras. Falhas da paginação guardam screenshot e trace para investigação. O comando usa um servidor local próprio e temporário.
+
 ## Alcance da validação
 
 Os testes foram executados nos arquivos locais da aplicação e nas prévias geradas. O teste PWA serviu o pacote real de `dist/` em um subdiretório, com service worker verdadeiro, recarga sem rede e preservação de dados pessoais. As respostas da maioria das consultas são controladas pelos testes ou vêm da coleção pública já baixada; isso permite testar erros e cancelamentos de forma reproduzível.

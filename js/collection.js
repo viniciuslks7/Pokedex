@@ -301,10 +301,14 @@ export function createCollection({ types, onSelect }) {
   });
   retry.addEventListener("click", () => refresh({ resetPage: false }));
   function turnPage(offset) {
+    const position = pagination.getBoundingClientRect().top;
     page += offset;
     renderPage();
-    select("#collection-heading").focus({ preventScroll: true });
-    select("#collection-heading").scrollIntoView({ block: "start" });
+    // Keep the controls under the pointer, including a shorter final page.
+    // The range is announced by collection-status without moving keyboard focus.
+    const movement = pagination.getBoundingClientRect().top - position;
+    if (Math.abs(movement) > 1)
+      window.scrollBy({ top: movement, behavior: "instant" });
   }
   previous.addEventListener("click", () => {
     if (!previous.disabled) turnPage(-1);
