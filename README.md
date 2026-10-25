@@ -229,7 +229,7 @@ Elas verificam multiplicadores de tipos duplos, neutralizações e imunidades, f
 Os testes de navegador em `tests/browser.cjs`, `tests/exploration.cjs`, `tests/visual.cjs` e `tests/strategy.cjs` usam Playwright e respostas simuladas da API. Com o servidor iniciado, instale as ferramentas de teste fora do projeto e execute:
 
 ```sh
-npm install --prefix /tmp/pokedex-browser-tests --no-audit --no-fund playwright
+npm install --prefix /tmp/pokedex-browser-tests --no-audit --no-fund playwright axe-core@4.11.0
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node /tmp/pokedex-browser-tests/node_modules/playwright/cli.js install chromium
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/browser.cjs
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/exploration.cjs
@@ -250,6 +250,7 @@ NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/dex-progress.cjs
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/attack-coverage.cjs
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/section-navigation.cjs
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/field-notes.cjs
+NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/accessibility.cjs
 # Teste independente com servidor local próprio e service worker real:
 NODE_PATH=/tmp/pokedex-browser-tests/node_modules node tests/pwa.cjs
 ```
@@ -281,5 +282,7 @@ A suíte `tests/section-navigation.cjs` verifica o link de salto, indicação da
 A suíte `tests/field-notes.cjs` verifica salvamento automático e posição do cursor, compartilhamento entre formas, recarga, busca por texto/nome com acentos, renderização literal de marcação, limite de 500 caracteres, exclusão/desfazer sem sobrescrever uma versão nova, transferência real de backup, conflitos, substituição, arquivos antigos, revisão desatualizada, limites e dados inválidos. Cobre ambos os temas em 320–1.440 pixels, leitura de notas de espécies indisponíveis, limite de 100, recuperação de armazenamento corrompido e exportação dos dados da sessão quando o armazenamento é bloqueado, com zero requisições externas. A suíte do aplicativo verifica as notas após recarga offline e limpeza dos dados públicos guardados.
 
 A suíte `tests/pwa.cjs` usa um service worker real em um subdiretório, valida o manifesto e os ícones, bloqueia as requisições externas e recarrega a página sem rede. Confere consultas por nome, imagens, dados de espécie e tipos, áudio com intervalos de bytes, exportação PNG com recursos guardados, mensagens para consultas não armazenadas, limpeza sem perder favoritos/equipes, atualização real do worker e falha na instalação. A interação com o convite de instalação é simulada; o teste não instala um aplicativo no sistema operacional. As demais suítes bloqueiam service workers para manter as respostas simuladas da API isoladas.
+
+A suíte `tests/accessibility.cjs` usa axe-core para verificar critérios automatizáveis WCAG 2.1 A/AA nos temas claro e escuro, em 375 e 1.440 pixels: página inicial, menu de seções e controles após favoritar, adicionar à equipe, escrever uma nota e abrir os filtros. Exige zero erros de JavaScript e zero consultas externas. O relatório em `/tmp/pokedex-accessibility-results.json` também registra verificações inconclusivas que precisam de avaliação manual; a auditoria automatizada não substitui testes com leitores de tela e pessoas com deficiência.
 
 Projeto de fã, sem afiliação à Nintendo, Game Freak ou The Pokémon Company.

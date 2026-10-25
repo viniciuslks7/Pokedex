@@ -179,7 +179,7 @@ const html = readFileSync(path.join(root, "preview-offline.html"), "utf8");
     const isolated = await context.newPage();
     isolated.on("pageerror", (error) => errors.push(error.message));
     await isolated.setContent(
-      '<iframe sandbox="allow-scripts allow-forms" title="Prévia offline"></iframe>',
+      '<style>body{margin:0}iframe{display:block;width:100%;height:100vh;border:0}</style><iframe sandbox="allow-scripts allow-forms" title="Prévia offline"></iframe>',
     );
     await isolated.locator("iframe").evaluate((frame, content) => {
       frame.srcdoc = content;

@@ -1,12 +1,12 @@
 :root {
   color-scheme: light;
   --ink: #193c30;
-  --muted: #69796c;
+  --muted: #596b5c;
   --paper: #f6f5ef;
   --line: #dce3d7;
   --green: #316449;
   --accent: #d2e4b2;
-  --type-color: #477a42;
+  --type-color: #41703d;
   --stage-color: #e6edda;
   --world-tint: #c6d9b9;
   --surface: #ffffff;
@@ -1268,7 +1268,7 @@ h3 {
 }
 .stats-note {
   font-size: 10px;
-  color: #7b8c73;
+  color: var(--muted);
   margin: 20px 0 0;
 }
 .pokemon-card[aria-busy="true"] .artwork img {
@@ -2850,7 +2850,7 @@ body.motion-paused *:after {
   padding: 15px;
   border: 1px dashed #cbd6bf;
   border-radius: 12px;
-  color: #7b8c73;
+  color: var(--muted);
   background: #f8f9f240;
 }
 .team-empty span {

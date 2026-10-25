@@ -69,6 +69,8 @@ function inlineAsset(relativePath) {
     if (!html.includes(marker))
       throw new Error(`HTML entry changed: ${marker}`);
   }
+  if (!/<main\b[^>]*>/.test(html))
+    throw new Error("HTML entry changed: main content missing");
   html = html
     .replace(/\s*<link rel="manifest"[^>]*>/, "")
     .replace(/\s*<link rel="apple-touch-icon"[^>]*>/, "")
@@ -78,7 +80,7 @@ function inlineAsset(relativePath) {
     )
     .replace(entryScript, "")
     .replace(icon, () => `href="${inlineAsset("favicons/favicon-16x16.png")}"`)
-    .replace("<main>", () => `<main>${offlineNote}`)
+    .replace(/<main\b[^>]*>/, (opening) => opening + offlineNote)
     .replace(
       "</body>",
       () =>
